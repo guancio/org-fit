@@ -16,7 +16,10 @@
 (defvar org-fit-last-value "vol")
 (defvar org-fit-last-groupby "month")
 (defvar org-fit-last-months "all")
+(defvar org-fit-last-muscle "all")
 
+
+(defvar org-fit-cli-callback nil)
 
 (defun org-fit-update-graph (proc output)
   (when (buffer-live-p (process-buffer proc))
@@ -28,11 +31,13 @@
                (insert output)
                (set-marker (process-mark proc) (point)))
              (if moving (goto-char (process-mark proc))))))
-  (with-current-buffer (get-buffer-create "*org-fit-graph*")
-    (erase-buffer)
-    (clear-image-cache t)
-    (insert-image (create-image org-fit-graph-file))
-    ))
+  (if (and (not (eq org-fit-cli-callback nil))
+           (string-match-p (regexp-quote ">") output))
+      (let ((cb org-fit-cli-callback))
+        (setq org-fit-cli-callback nil)
+        (funcall cb)
+    )))
+
 
 (defvar org-fit-cli-process nil)
 (defun org-fit-start-cli ()
@@ -43,14 +48,28 @@
   (set-process-filter org-fit-cli-process 'org-fit-update-graph)
   (org-fit-show-graph)
   (switch-to-buffer-other-window "*org-fit-graph*")
+  (org-fit-mode)
   )
 
 
+(defun org-fit-update-graph-callback ()
+  (with-current-buffer (get-buffer-create "*org-fit-graph*")
+    (erase-buffer)
+    (clear-image-cache t)
+    (insert-image (create-image org-fit-graph-file))
+    ))
+
 (defun org-fit-show-graph()
   (interactive)
+  (message (format "graph %s %s %s %s %s\n"
+                               org-fit-last-value org-fit-last-groupby
+                               org-fit-last-months org-fit-last-muscle
+                               org-fit-graph-file))
+  (setq org-fit-cli-callback 'org-fit-update-graph-callback)
   (process-send-string org-fit-cli-process
-                       (format "graph %s %s %s %s\n"
-                               org-fit-last-value org-fit-last-groupby org-fit-last-months
+                       (format "graph %s %s %s %s %s\n"
+                               org-fit-last-value org-fit-last-groupby
+                               org-fit-last-months org-fit-last-muscle
                                org-fit-graph-file))
   )
 
@@ -66,12 +85,28 @@
   (setq org-fit-last-months months)
   (org-fit-show-graph))
 
+(defun org-fit-set-category-callback ()
+  (let* ((str_values 
+         (with-current-buffer "*org-fit-log*"
+           ;; This is slow
+           (string-trim (car (last (split-string (buffer-string) ">") 2)))
+           ))
+         (lst_values (cons "all" (split-string str_values ","))))
+    (helm :sources (helm-build-sync-source "Muscle"
+                     :candidates lst_values
+                     :action (lambda (candidate)
+                               (setq org-fit-last-muscle candidate)
+                               (org-fit-show-graph))
+                     ))
+    )
+  )
+
+
 (defun org-fit-set-category ()
   (interactive)
-  (helm :sources (helm-build-sync-source "Muscle"
-                   :candidates '("All"  "Shoulders"  "Triceps"  "Biceps"  "Chest"  "Back"  "Legs"  "Abs"  "Cardio")
-                   :action (lambda (candidate) (message candidate))
-                   )))
+  (setq org-fit-cli-callback 'org-fit-set-category-callback)
+  (process-send-string org-fit-cli-process "list_muscles\n"))
+  
 
 (general-define-key
  :keymaps 'org-fit-mode-map
