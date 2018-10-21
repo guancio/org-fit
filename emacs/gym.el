@@ -1,6 +1,7 @@
-(defvar org-fit-data-file "/home/guancio/Sources/org-fit/data/res.org")
-(defvar org-fit-graph-file "/home/guancio/Sources/org-fit/data/graph.png")
-(defvar org-fit-cli-exec "/home/guancio/Sources/org-fit/cli/cli.py")
+(defvar org-fit-data-file)
+(defvar org-fit-graph-file)
+(defvar org-fit-cli-exec)
+(defvar org-fit-csv-file)
 
 
 ;; Create the keymap for this mode.
@@ -17,7 +18,6 @@
 (defvar org-fit-last-groupby "month")
 (defvar org-fit-last-months "all")
 (defvar org-fit-last-muscle "all")
-(setq org-fit-cli-exec "/home/guancio/Sources/org-fit/cli/cli.py")
 
 
 (defvar org-fit-cli-callback nil)
@@ -113,7 +113,8 @@
   (interactive)
   (setq org-fit-cli-callback nil)
   (process-send-string org-fit-cli-process
-                       (format "import /home/guancio/Downloads/export.csv %s\n"
+                       (format "import %s %s\n"
+                               org-fit-csv-file
                                org-fit-data-file)))
 
 
@@ -137,3 +138,5 @@
 
  "q"  'org-fit-set-category
  )
+
+(provide 'gym)

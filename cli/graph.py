@@ -52,7 +52,7 @@ def get_all_muscles(trains):
 # trains.groupby('muscle').count()
 # trains.groupby('muscle').count().plot.pie(subplots=True)
 # trains.groupby('muscle').count()['count'].plot.pie()
-# orgparser.parse_gym_file("/home/guancio/Sources/org-fit/data/res.org")
+# trains = orgparser.parse_gym_file("/home/guancio/Sources/org-fit/data/res.org")
 
 def draw_line_graph(trains, value, groupby, months, muscle, filename):
     to_plot = prepare_data(trains, value, groupby, months, muscle)
@@ -66,4 +66,42 @@ def draw_line_graph(trains, value, groupby, months, muscle, filename):
     #plt.show()
     plt.close(fig)
 
+if (0):
+    to_process = trains.copy()
+    to_process = to_process.set_index('date')
+    to_process= to_process.sort_index()
+    filtered = to_process
+    filtered = to_process.last('1M')
+    filtered = to_process.last('1W')
 
+    filtered['volume'] = filtered['weight'] * filtered['count']
+    filtered.set_index('muscle')
+    filtered['reps'] = filtered['count']
+    grouped = filtered.groupby('muscle')
+    values = grouped.agg({
+        'count': np.size,
+        'volume': np.sum,
+        'reps' : np.sum
+    })
+
+    fig, ax = plt.subplots(nrows=1, ncols=1)
+    values.plot.pie(subplots=True)
+    plt.show()
+    plt.close(fig)
+
+    to_process = trains.copy()
+    to_process = to_process.set_index('date')
+    to_process= to_process.sort_index()
+    to_process['volume'] = to_process['weight'] * to_process['count']
+    to_process = to_process[to_process['muscle'] == 'Abs']
+    grouped = to_process.groupby(pd.Grouper(freq='D'))
+    values = grouped.agg({
+        # 'count': np.size,
+        # 'volume': np.sum,
+        # 'reps' : np.sum,
+        'weight' : np.max
+    })
+    k = values.keys()[0]
+    values = values[values[k] > 0]
+    values.plot()
+    plt.show()

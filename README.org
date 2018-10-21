@@ -1,0 +1,123 @@
+* org-fit
+The idea is to develop a "fitness tracking utility" (i.e.
+Strava/Runkeeper) based on org format. I started development mainly to
+learn a bit of Elisp and because I was disappointed by the switch to
+closed source license of Runalyze.
+*For now it is just a small prototype*
+
+The architecture consists of three components:
+- org-mode (actually the org-mode text format) to sitore data in human
+  readable format. Org-mode format will play the same role of maildir
+  for mu4e and ledger files for ledger.
+- a command line utility (server) to process and index org-mode files.
+  This plays the same role of mmu for mu4e and ledger
+- a user interface (GUI) to present graph and statistics produced via
+  the server
+
+* org-fit format
+For now I'm only working on gym notes: i.e. notes taken while
+training in the gym. The idea is to have functionalities on par with
+[[https://play.google.com/store/apps/details?id=com.github.jamesgay.fitnotes&hl=en]]
+
+Each workout is a top-level entity. The second string of the entity
+title must be a date in format YYYY-MM-DD. The date will probably
+become a property of the entity.
+#+BEGIN_EXAMPLE
+ * Workout 2018-01-24...
+#+END_EXAMPLE
+
+Each exercise is a sub-entity of a workout entity. An exercise can
+have the following optional properties :
+- name; it's the name of the entity
+- muscle: a string to identifying the type of exercise. E.g Cardio,
+  Abs, Legs.
+- time: duration of the exercise (will be renamed duration) in format
+  hh:mm:ss
+- distance: distance in meters, i.e. 3200.0 m
+#+BEGIN_EXAMPLE
+ ** Rowing Machine
+:PROPERTIES:
+:muscle: Cardio 
+:time: 0:15:39 
+:distance: 3200.0 m
+:END:
+#+END_EXAMPLE
+#+BEGIN_EXAMPLE
+ ** Crunch Machine
+:PROPERTIES:
+:muscle: Abs  
+:END:
+#+END_EXAMPLE
+
+An exercise can have multiple sets. Sets are expressed as a =-= list. 
+#+BEGIN_EXAMPLE
+- 11.0 kgs x 10 reps
+- 11.0 kgs x 15 reps
+- 11.0 kgs x 15 reps
+#+END_EXAMPLE
+Weight property for sets is optional
+#+BEGIN_EXAMPLE
+- 10 reps
+- 15 reps
+- 15 reps
+#+END_EXAMPLE
+
+You can find a complete example in [[file:example.org]]
+
+
+* server
+The server is implemented via a small command line python utility in
+=cli/cly.py=.
+The server has a prompt, which allows to load org-files (and in future
+indexes) and process them without need of reloading them for each
+invocation.
+
+The server supports the following commands
+- =import csvfile orgfile= Converts a CSV file exported by fitnotes
+  Android app to org-fit format
+- =quit= Quit the program
+- =load_org orgfile= Loads an org-fit file
+- =list_muscles= List the tags used to classify exercises
+- =graph value groupby months muscle filename= produces a linear graph
+  from the loaded fit file
+  - =value= is the value displayed and can be =count= (number of
+    exercises), =sets= (number of sets), =reps= (total number of
+    repetitions), =volume= (weight x reps)
+  - =groupsby= is the resolution of the =x= axis and can be =day=,
+    =week=, or =month=
+  - =months= is the interval of the =x= axis and can be =all= (no
+    limit) or an integer representing the number of months
+  - =muscle= filters the exercises and can be =all= or one of the strings
+    used to tag the exercises (i.e. Chest)
+  - =filename= filename of the produced png
+
+The server uses pandas, numpy, and matplotlib
+
+* GUI
+The GUI consists of the emacs mode defined in [[file:emacs/gym.el]].
+
+** Configuration
+There are four variables to customize:
+- =org-fit-data-file= full-path of your org-fit file
+- =org-fit-graph-file= full-path of the temporary file used to produce the graphs
+- =org-fit-cli-exec= full-path of =cli.py=
+- =org-fit-csv-file= full-path of the csv file to import (only for
+  debug purpose)
+
+** Starting the GUI
+=org-fit-start-cli= starts the server process and open a new buffer in
+=org-fit-graph= mode.
+** Keybinding in =org-fit-graph=
+- =z= show volume
+- =x= show number of exercises
+- =c= show number of sets
+- =v= show number of reps
+- =a= group by day
+- =s= group by week
+- =d= group by month
+- =1= show last month
+- =2= show last two months
+- =3= show last three months
+- =6= show last six months
+- =0= no time limit
+- =q= filter by muscle
