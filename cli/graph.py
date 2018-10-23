@@ -24,6 +24,7 @@ def prepare_data(trains, value, groupby, months, muscle):
     else:
         return None
     to_process['volume'] = to_process['weight'] * to_process['count']
+    to_process['reps'] = to_process['count']
     if (value != "count"):
         grouped = to_process.groupby(pd.Grouper(freq=group_freq))
         if value == "sets":
@@ -48,11 +49,6 @@ def prepare_data(trains, value, groupby, months, muscle):
 def get_all_muscles(trains):
     return trains.groupby('muscle').count()
 
-# import orgparser
-# trains.groupby('muscle').count()
-# trains.groupby('muscle').count().plot.pie(subplots=True)
-# trains.groupby('muscle').count()['count'].plot.pie()
-# trains = orgparser.parse_gym_file("/home/guancio/Sources/org-fit/data/res.org")
 
 def draw_line_graph(trains, value, groupby, months, muscle, filename):
     to_plot = prepare_data(trains, value, groupby, months, muscle)
@@ -66,29 +62,50 @@ def draw_line_graph(trains, value, groupby, months, muscle, filename):
     #plt.show()
     plt.close(fig)
 
-if (0):
+
+def draw_pie_graph(trains, value, period, filename):
     to_process = trains.copy()
     to_process = to_process.set_index('date')
     to_process= to_process.sort_index()
     filtered = to_process
-    filtered = to_process.last('1M')
-    filtered = to_process.last('1W')
+    if period == "week":
+        filtered = to_process.last('1M')
+    elif period == "month":
+        filtered = to_process.last('1W')
+    else:
+        return
 
     filtered['volume'] = filtered['weight'] * filtered['count']
     filtered.set_index('muscle')
     filtered['reps'] = filtered['count']
-    grouped = filtered.groupby('muscle')
-    values = grouped.agg({
-        'count': np.size,
-        'volume': np.sum,
-        'reps' : np.sum
-    })
-
+     
+    if (value != "count"):
+        grouped = filtered.groupby('muscle')
+        if value == "sets":
+            values = grouped.agg({'count': np.size})
+        elif value == "reps":
+            values = grouped.agg({'reps': np.sum})
+        elif value == "vol":
+            values = grouped.agg({'volume': np.sum})
+        else:
+            values = None
+    else:
+        return None
+        grouped = to_process.groupby(pd.Grouper(freq='D'))
+        values = grouped.agg({'count': np.size})
+        values = values[values['count'] > 0]
+        grouped2 = values.groupby('muscle')
+        values = grouped2.agg({'count': np.size})
+     
     fig, ax = plt.subplots(nrows=1, ncols=1)
-    values.plot.pie(subplots=True)
-    plt.show()
+    plt.axis('equal')
+    ax.pie(values, autopct='%1.0f%%', labels=values.index.values)
+    plt.title(value)
+    fig.savefig(filename)
     plt.close(fig)
 
+    
+if (0):
     to_process = trains.copy()
     to_process = to_process.set_index('date')
     to_process= to_process.sort_index()

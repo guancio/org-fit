@@ -22,6 +22,13 @@ class FitCli(Cmd):
         graph.draw_line_graph(self.trains, value, groupby, months, muscle, filename)
         print "Produced %s" % filename
 
+    def do_pie(self, args):
+        """pie value groupby muscle"""
+        (value,period,filename) = args.split(" ")
+
+        graph.draw_pie_graph(self.trains, value, period, filename)
+        print "Produced %s" % filename
+
     def do_list_muscles(self, args):
         r = graph.get_all_muscles(self.trains)
         print ",".join(r.index.values)
