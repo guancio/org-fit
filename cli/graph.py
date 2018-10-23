@@ -4,7 +4,7 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-
+plt.xkcd()
 
 def prepare_data(trains, value, groupby, months, muscle):
     to_process = trains.copy()

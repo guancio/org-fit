@@ -5,6 +5,9 @@ learn a bit of Elisp and because I was disappointed by the switch to
 closed source license of Runalyze.
 *For now it is just a small prototype*
 
+[[file:Screenshot_2018-10-23_21-43-06.png]]
+
+
 The architecture consists of three components:
 - org-mode (actually the org-mode text format) to sitore data in human
   readable format. Org-mode format will play the same role of maildir
