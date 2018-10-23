@@ -18,6 +18,7 @@
 (defvar org-fit-last-groupby "month")
 (defvar org-fit-last-months "all")
 (defvar org-fit-last-muscle "all")
+(defvar org-fit-last-type :lines)
 
 
 (defvar org-fit-cli-callback nil)
@@ -62,17 +63,17 @@
 
 (defun org-fit-show-graph()
   (interactive)
-  (message (format "graph %s %s %s %s %s\n"
-                               org-fit-last-value org-fit-last-groupby
-                               org-fit-last-months org-fit-last-muscle
-                               org-fit-graph-file))
   (setq org-fit-cli-callback 'org-fit-update-graph-callback)
-  (process-send-string org-fit-cli-process
-                       (format "graph %s %s %s %s %s\n"
-                               org-fit-last-value org-fit-last-groupby
-                               org-fit-last-months org-fit-last-muscle
-                               org-fit-graph-file))
-  )
+  (if (eq :lines org-fit-last-type)
+      (process-send-string org-fit-cli-process
+                           (format "graph %s %s %s %s %s\n"
+                                   org-fit-last-value org-fit-last-groupby
+                                   org-fit-last-months org-fit-last-muscle
+                                   org-fit-graph-file))
+    (process-send-string org-fit-cli-process
+                         (format "pie %s month %s\n"
+                                 org-fit-last-value  org-fit-graph-file))
+    ))
 
 (defun org-fit-set-value (value)
   (setq org-fit-last-value value)
@@ -108,6 +109,9 @@
   (setq org-fit-cli-callback 'org-fit-set-category-callback)
   (process-send-string org-fit-cli-process "list_muscles\n"))
 
+(defun org-fit-set-type (type)
+  (setq org-fit-last-type type)
+  (org-fit-show-graph))
 
 (defun org-fit-import-csv ()
   (interactive)
@@ -135,6 +139,9 @@
  "3"  (lambda () (interactive) (org-fit-set-months "3"))
  "6"  (lambda () (interactive) (org-fit-set-months "6"))
  "0"  (lambda () (interactive) (org-fit-set-months "all"))
+
+ "p"  (lambda () (interactive) (org-fit-set-type :pie))
+ "l"  (lambda () (interactive) (org-fit-set-type :lines))
 
  "q"  'org-fit-set-category
  )
