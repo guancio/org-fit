@@ -35,16 +35,20 @@ def import_csv(filein, fileout):
     out = open(fileout, "w")
     for workout in grouped_entry:
         out.write("""
-* Workout %s""" % workout[0][0][0])
+* Workout
+:PROPERTIES:
+:date: %s
+:END:
+""" % workout[0][0][0])
         for activity in workout:
-            time = "\n:time: %s"%activity[0][7] if len(activity) == 1 and activity[0][7] != "" else ""
+            duration = "\n:duration: %s"%activity[0][7] if len(activity) == 1 and activity[0][7] != "" else ""
             distance = "\n:distance: %s %s"%(activity[0][5], activity[0][6]) if len(activity) == 1 and activity[0][5] != "" else ""
             out.write("""
 ** %s
 :PROPERTIES:
 :muscle: %s %s %s
 :END:
-""" % (activity[0][1], activity[0][2], time, distance))
+""" % (activity[0][1], activity[0][2], duration, distance))
             for rep in activity:
                 if (rep[3] == "") and (rep[4] == ""):
                     continue
@@ -53,4 +57,3 @@ def import_csv(filein, fileout):
                 else:
                     out.write("- %s reps\n" % (rep[4]))
     out.close()
-    # :time: 0:05:00

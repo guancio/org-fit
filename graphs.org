@@ -1,0 +1,115 @@
+# -*- org-confirm-babel-evaluate: nil; -*-
+#+SETUPFILE: org-html-themes/setup/theme-readtheorg.setup
+
+* Initialization :noexport:
+#+begin_src emacs-lisp :results silent :exports none
+  (add-hook 'org-babel-after-execute-hook 'org-display-inline-images)   
+  (add-hook 'org-mod-hook 'org-display-inline-images)
+#+end_src
+
+#+name: config_session
+#+begin_src python :session plots :exports none
+fit_path = "/home/guancio/Sources/org-fit/cli"
+org_file = "/home/guancio/Sources/org-fit/data/res.org"
+#+end_src
+
+#+RESULTS: config_session
+
+#+name: start_session
+#+begin_src python :session plots :exports none
+import sys
+import os
+sys.path.append(fit_path)
+import orgparser
+import graph
+import csvimport
+from cmd import Cmd
+trains = orgparser.parse_gym_file(org_file)
+#+end_src
+
+#+RESULTS: start_session
+
+* Utils :noexport:
+#+name: kill_session
+#+begin_src python :session plots :results output :exports none
+# exit(1)
+#+end_src
+
+#+RESULTS: kill_session
+
+* History
+** Volume last 12 months
+#+header: :var value="vol"
+#+header: :var time="month"
+#+header: :var months=12
+#+begin_src python :session plots :results file :exports results
+filename = fit_path + "/../data/vol.png"
+graph.draw_line_graph(trains, value, time, months, "all", filename)
+filename
+#+end_src
+
+#+RESULTS:
+[[file:/home/guancio/Sources/org-fit/cli/../data/vol.png]]
+
+
+** Reps last 6 months
+#+header: :var value="reps"
+#+header: :var time="month"
+#+header: :var months=6
+#+begin_src python :session plots :results file :exports results
+filename = fit_path + "/../data/reps.png"
+graph.draw_line_graph(trains, value, time, months, "all", filename)
+filename
+#+end_src
+
+#+RESULTS:
+[[file:/home/guancio/Sources/org-fit/cli/../data/reps.png]]
+
+
+** Reps Abs last 6 months
+#+header: :var value="reps"
+#+header: :var time="month"
+#+header: :var months=6
+#+begin_src python :session plots :results file :exports results
+filename = fit_path + "/../data/abs-reps.png"
+graph.draw_line_graph(trains, value, time, months, "Abs", filename)
+filename
+#+end_src
+
+#+RESULTS:
+[[file:/home/guancio/Sources/org-fit/cli/../data/abs-reps.png]]
+
+
+* Breakdown
+** Reps By muscle last month
+#+header: :var value="reps"
+#+header: :var period="month"
+#+begin_src python :session plots :results file :exports results
+filename = fit_path + "/../data/bd-reps.png"
+graph.draw_pie_graph(trains, value, period, filename)
+filename
+#+end_src
+
+#+RESULTS:
+[[file:/home/guancio/Sources/org-fit/cli/../data/bd-reps.png]]
+
+
+** Vol By muscle last week
+#+header: :var value="vol"
+#+header: :var period="week"
+#+begin_src python :session plots :results file :exports results
+filename = fit_path + "/../data/bd-vol.png"
+graph.draw_pie_graph(trains, value, period, filename)
+filename
+#+end_src
+
+#+RESULTS:
+[[file:/home/guancio/Sources/org-fit/cli/../data/bd-vol.png]]
+
+
+* Workouts
+#+INCLUDE: "data/res.org" :minlevel 2
+
+
+* Experiments
+

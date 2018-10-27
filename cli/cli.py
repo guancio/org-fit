@@ -16,8 +16,6 @@ class FitCli(Cmd):
     def do_graph(self, args):
         """graph value groupby months"""
         (value,groupby,months,muscle,filename) = args.split(" ")
-        months = None if months == "all" else int(months)
-        muscle = None if muscle == "all" else muscle
 
         graph.draw_line_graph(self.trains, value, groupby, months, muscle, filename)
         print "Produced %s" % filename

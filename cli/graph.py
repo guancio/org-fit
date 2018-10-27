@@ -10,9 +10,9 @@ def prepare_data(trains, value, groupby, months, muscle):
     to_process = trains.copy()
     to_process = to_process.set_index('date')
     to_process= to_process.sort_index()
-    if months is not None:
-        to_process = to_process.last('%dM'%months)
-    if muscle is not None:
+    if months != "all":
+        to_process = to_process.last('%dM'%int(months))
+    if muscle != "all":
         to_process = to_process[to_process['muscle'] == muscle]
     group_freq = None
     if groupby == "day":
@@ -72,8 +72,10 @@ def draw_pie_graph(trains, value, period, filename):
         filtered = to_process.last('1M')
     elif period == "month":
         filtered = to_process.last('1W')
+    elif period == "all":
+        filtered = to_process
     else:
-        return
+        return None
 
     filtered['volume'] = filtered['weight'] * filtered['count']
     filtered.set_index('muscle')
