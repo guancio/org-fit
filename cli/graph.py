@@ -6,6 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 plt.xkcd()
 
+next_file_id = 1
+
 def prepare_data(trains, value, groupby, months, muscle):
     to_process = trains.copy()
     to_process = to_process.set_index('date')
@@ -50,6 +52,13 @@ def get_all_muscles(trains):
     return trains.groupby('muscle').count()
 
 
+def get_file_name(filename):
+    global next_file_id
+    if not filename.endswith(".png"):
+        filename += "%d.png" % next_file_id
+        next_file_id += 1
+    return filename
+
 def draw_line_graph(trains, value, groupby, months, muscle, filename):
     to_plot = prepare_data(trains, value, groupby, months, muscle)
     if to_plot is None:
@@ -58,9 +67,11 @@ def draw_line_graph(trains, value, groupby, months, muscle, filename):
     ax.plot(to_plot)
     plt.title(value)
     plt.legend()
+    filename = get_file_name(filename)
     fig.savefig(filename)
     #plt.show()
     plt.close(fig)
+    return filename
 
 
 def draw_pie_graph(trains, value, period, filename):
@@ -103,8 +114,10 @@ def draw_pie_graph(trains, value, period, filename):
     plt.axis('equal')
     ax.pie(values, autopct='%1.0f%%', labels=values.index.values)
     plt.title(value)
+    filename = get_file_name(filename)
     fig.savefig(filename)
     plt.close(fig)
+    return filename
 
     
 if (0):
