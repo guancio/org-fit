@@ -1,8 +1,11 @@
-* Workout 2018-01-24
+* Workout
+:PROPERTIES:
+:date: 2018-01-24
+:END:
 ** Rowing Machine
 :PROPERTIES:
 :muscle: Cardio 
-:time: 0:15:39 
+:duration: 0:15:39 
 :distance: 3200.0 m
 :END:
 
@@ -14,7 +17,10 @@
 - 35.0 kgs x 12 reps
 - 35.0 kgs x 12 reps
 
-* Workout 2018-01-31
+* Workout 
+:PROPERTIES:
+:date: 2018-01-31
+:END:
 ** Flat Barbell Bench Press
 :PROPERTIES:
 :muscle: Chest  

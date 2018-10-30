@@ -35,18 +35,23 @@ Parse a complete exercise
             continue
         ex = ex.append(res, ignore_index=True)
     ex['muscle'] = muscle
+    ex['exercise'] = e2.heading
     return ex
 
 # parse_ex(base.root.content[1].content[1])
 
 def parse_tr(e1):
     tr = pd.DataFrame({ 'date': [], 'weight' : [], 'count': [], 'muscle' : []})
-    time_text = e1.heading.split(" ")[1]
-    time_value = datetime.strptime(time_text, "%Y-%m-%d")
     for e2 in e1.content:
-        ex = parse_ex(e2)
-        ex['date'] = time_value
-        tr = tr.append(ex, ignore_index=True)
+        if isinstance(e2, PyOrgMode.OrgElement):
+            if e2.TYPE == "DRAWER_ELEMENT" and e2.name == "PROPERTIES":
+                for prop in e2.content:
+                    if prop.name == "date":
+                        time_value = datetime.strptime(prop.value.strip(), "%Y-%m-%d")
+                continue
+            ex = parse_ex(e2)
+            ex['date'] = time_value
+            tr = tr.append(ex, ignore_index=True)
     return tr
 
 # parse_tr(base.root.content[1])

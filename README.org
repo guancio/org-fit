@@ -5,11 +5,12 @@ learn a bit of Elisp and because I was disappointed by the switch to
 closed source license of Runalyze.
 *For now it is just a small prototype*
 
-[[file:Screenshot_2018-10-23_21-43-06.png]]
+[[file:screen.png]]
 
+[[file:export-web.png]]
 
 The architecture consists of three components:
-- org-mode (actually the org-mode text format) to sitore data in human
+- org-mode (actually the org-mode text format) to store data in human
   readable format. Org-mode format will play the same role of maildir
   for mu4e and ledger files for ledger.
 - a command line utility (server) to process and index org-mode files.
@@ -26,7 +27,10 @@ Each workout is a top-level entity. The second string of the entity
 title must be a date in format YYYY-MM-DD. The date will probably
 become a property of the entity.
 #+BEGIN_EXAMPLE
- * Workout 2018-01-24...
+ * Workout
+:PROPERTIES:
+:date: 2018-01-24
+:END:
 #+END_EXAMPLE
 
 Each exercise is a sub-entity of a workout entity. An exercise can
@@ -34,7 +38,7 @@ have the following optional properties :
 - name; it's the name of the entity
 - muscle: a string to identifying the type of exercise. E.g Cardio,
   Abs, Legs.
-- time: duration of the exercise (will be renamed duration) in format
+- duration: duration of the exercise in format
   hh:mm:ss
 - distance: distance in meters, i.e. 3200.0 m
 #+BEGIN_EXAMPLE
@@ -67,7 +71,6 @@ Weight property for sets is optional
 
 You can find a complete example in [[file:example.org]]
 
-
 * server
 The server is implemented via a small command line python utility in
 =cli/cly.py=.
@@ -94,33 +97,37 @@ The server supports the following commands
     used to tag the exercises (i.e. Chest)
   - =filename= filename of the produced png
 
-The server uses pandas, numpy, and matplotlib
+The server uses pandas, numpy, matplotlib, and orgparser
 
 * GUI
-The GUI consists of the emacs mode defined in [[file:emacs/gym.el]].
+The GUI consists of an org-file where you can add graph and statistics
+and emacs functions defined in [[file:emacs/gym.el]].
 
 ** Configuration
-There are four variables to customize:
-- =org-fit-data-file= full-path of your org-fit file
-- =org-fit-graph-file= full-path of the temporary file used to produce the graphs
-- =org-fit-cli-exec= full-path of =cli.py=
-- =org-fit-csv-file= full-path of the csv file to import (only for
-  debug purpose)
+There are three variables to customize:
 
-** Starting the GUI
-=org-fit-start-cli= starts the server process and open a new buffer in
-=org-fit-graph= mode.
-** Keybinding in =org-fit-graph=
-- =z= show volume
-- =x= show number of exercises
-- =c= show number of sets
-- =v= show number of reps
-- =a= group by day
-- =s= group by week
-- =d= group by month
-- =1= show last month
-- =2= show last two months
-- =3= show last three months
-- =6= show last six months
-- =0= no time limit
-- =q= filter by muscle
+- =org-fit-data-file= full-path of your org-fit file
+- =org-fit-export-path= full-path of the directory used to produce the graphs
+- =org-fit-cli-exec= full-path of =cli.py=
+
+** Using the GUI
+Open an org file like [[file:analysis.org]]. This is your main GUI. Graph
+are produced by manipulating org-babel snippets.
+
+- To start the org-fit execute =org-fit-start=.
+- To add a graph for historical data execute =org-fit-add-graph-history=
+- To add a pie chart graph execute =org-fit-add-graph-breakout=
+- You can update a graph by moving the cursor in the corresponding
+  org-babel fragment and use the following keybinding
+ - =C-q 1= display volume (i.e. kg * reps)
+ - =C-q 2= display reps
+ - =C-q 3= display number of workouts
+ - =C-q 4= display sets
+ - =C-w 1= group per month
+ - =C-w 2= group per week
+ - =C-w 3= group per day
+ - =C-e 1= limit results to last month
+ - =C-e 2= limit results to two months
+ - =C-e 3= limit results to three months
+ - =C-e 6= limit results to six month
+ - =C-e 0= no time limit

@@ -1,0 +1,25 @@
+# -*- org-confirm-babel-evaluate: nil; -*-
+#+SETUPFILE: org-html-themes/setup/theme-readtheorg.setup
+
+* History
+
+#+header: :var value="reps" period="month" months="all" muscle="all"
+#+begin_src python :session plots :results file :exports results
+graph.draw_line_graph(trains, value, period, months, muscle, data_path)
+#+end_src
+
+#+RESULTS:
+[[file:/home/guancio/Sources/org-fit/data/2.png]]
+
+* Breakout
+
+#+header: :var value="reps" period="month" 
+#+begin_src python :session plots :results file :exports results
+graph.draw_pie_graph(trains, value, period, data_path)
+#+end_src
+
+#+RESULTS:
+[[file:/home/guancio/Sources/org-fit/data/9.png]]
+
+* Workouts
+#+INCLUDE: "example.org" :minlevel 2
