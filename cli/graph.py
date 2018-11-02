@@ -8,7 +8,7 @@ plt.xkcd()
 
 next_file_id = 1
 
-def prepare_data(trains, value, groupby, months, muscle):
+def prepare_data(trains, groupby, months, muscle, exercise):
     to_process = trains.copy()
     to_process = to_process.set_index('date')
     to_process= to_process.sort_index()
@@ -16,6 +16,8 @@ def prepare_data(trains, value, groupby, months, muscle):
         to_process = to_process.last('%dM'%int(months))
     if muscle != "all":
         to_process = to_process[to_process['muscle'] == muscle]
+    if exercise != "all":
+        to_process = to_process[to_process['exercise'] == exercise]
     group_freq = None
     if groupby == "day":
         group_freq = 'D'
@@ -26,23 +28,21 @@ def prepare_data(trains, value, groupby, months, muscle):
     else:
         return None
     to_process['volume'] = to_process['weight'] * to_process['count']
+    to_process['sets'] = to_process['count']
     to_process['reps'] = to_process['count']
-    if (value != "count"):
-        grouped = to_process.groupby(pd.Grouper(freq=group_freq))
-        if value == "sets":
-            values = grouped.agg({'count': np.size})
-        elif value == "reps":
-            values = grouped.agg({'count': np.sum})
-        elif value == "vol":
-            values = grouped.agg({'volume': np.sum})
-        else:
-            return None
-    else:
-        grouped = to_process.groupby(pd.Grouper(freq='D'))
-        values = grouped.agg({'count': np.size})
-        values = values[values['count'] > 0]
-        grouped2 = values.groupby(pd.Grouper(freq=group_freq))
-        values = grouped2.agg({'count': np.size})
+    to_process['max-weight'] = to_process['weight']
+    to_process['max-reps'] = to_process['reps']
+    to_process['epley'] = to_process['weight'] * (1 + to_process['reps']/30)
+    grouped = to_process.groupby(pd.Grouper(freq=group_freq))
+    values = grouped.agg({
+        'sets': np.size,
+        'reps' : np.sum,
+        'volume' : np.sum,
+        'max-weight' : np.max,
+        'max-reps' : np.max,
+        # rep max: TODO
+        'epley' : np.max
+    })
 
     k = values.keys()[0]
     values = values[values[k] > 0]
@@ -50,6 +50,9 @@ def prepare_data(trains, value, groupby, months, muscle):
 
 def get_all_muscles(trains):
     return trains.groupby('muscle').count()
+
+def get_all_exercises(trains):
+    return trains.groupby('exercise').count()
 
 
 def get_file_name(filename):
@@ -59,17 +62,16 @@ def get_file_name(filename):
         next_file_id += 1
     return filename
 
-def draw_line_graph(trains, value, groupby, months, muscle, filename):
-    to_plot = prepare_data(trains, value, groupby, months, muscle)
+def draw_line_graph(trains, value, groupby, months, muscle, exercise, filename):
+    to_plot = prepare_data(trains, groupby, months, muscle, exercise)
     if to_plot is None:
         return
     fig, ax = plt.subplots(nrows=1, ncols=1)
-    ax.plot(to_plot)
-    plt.title(value)
-    plt.legend()
+    ax.plot(to_plot[value])
+    #plt.title(value)
+    #plt.legend()
     filename = get_file_name(filename)
     fig.savefig(filename)
-    #plt.show()
     plt.close(fig)
     return filename
 
@@ -119,7 +121,45 @@ def draw_pie_graph(trains, value, period, filename):
     plt.close(fig)
     return filename
 
+def get_summary(trains, groupby, months, muscle, exercise):
+    values = prepare_data(trains, groupby, months, muscle, exercise)
+    return [["date"] + list(values.keys())] + [
+        [i.strftime('%Y-%m-%d')] + ["{:.0f}".format(r[k]) for k in values.keys()]
+        for (i,r) in values.iterrows()]
     
+def get_breakout(trains, value, period):
+    to_process = trains.copy()
+    to_process = to_process.set_index('date')
+    to_process= to_process.sort_index()
+    filtered = to_process
+    if period == "week":
+        filtered = to_process.last('1M')
+    elif period == "month":
+        filtered = to_process.last('1W')
+    elif period == "all":
+        filtered = to_process
+    else:
+        return None
+     
+    filtered['volume'] = filtered['weight'] * filtered['count']
+    filtered.set_index('muscle')
+    filtered['reps'] = filtered['count']
+    grouped = filtered.groupby('muscle')
+    values = None
+    if value == "sets":
+        values = grouped.agg({'count': np.size})
+    elif value == "reps":
+        values = grouped.agg({'reps': np.sum})
+    elif value == "vol":
+        values = grouped.agg({'volume': np.sum})
+    else:
+        values = None
+     
+    k = values.keys()[0]
+    values[k] = values[k] / values.sum()[0]
+    return [(i, "{0:.0%}".format(r[k])) for (i,r) in values.iterrows()]
+
+
 if (0):
     to_process = trains.copy()
     to_process = to_process.set_index('date')

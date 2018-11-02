@@ -5,72 +5,123 @@
 
 
 ** Volume last 12 months
-#+header: :var value="vol"
-#+header: :var time="month"
-#+header: :var months=12
+
+#+header: :var value="volume" period="month" months="all" muscle="all" exercise="all"
 #+begin_src python :session plots :results file :exports results
-filename = fit_path + "/../data/vol.png"
-graph.draw_line_graph(trains, value, time, months, "all", filename)
-filename
+graph.draw_line_graph(trains, value, period, months, muscle, exercise, data_path)
 #+end_src
 
 #+RESULTS:
-[[file:/home/guancio/Sources/org-fit/cli/../data/vol.png]]
+[[file:/home/guancio/Sources/org-fit/data/7.png]]
+
+
+#+header: :var period="month" months="all" muscle="all" exercise="all"
+#+begin_src python :session plots :results value :exports results
+graph.get_summary(trains, period, months, muscle, exercise)
+#+end_src
+
+#+RESULTS:
+|       date | max-weight | reps | max-reps | volume | sets | epley |
+| 2018-01-01 |         60 |  343 |       15 |   7133 |   30 |    88 |
+| 2018-02-01 |         69 |  840 |       16 |  16696 |   75 |    83 |
+| 2018-03-01 |         38 | 1017 |       16 |  20857 |   93 |    50 |
+| 2018-04-01 |         41 | 1663 |       14 |  37208 |  163 |    53 |
+| 2018-05-01 |         38 |  690 |       15 |  13150 |   64 |    50 |
+| 2018-06-01 |         41 | 1092 |       15 |  25575 |  104 |    55 |
+| 2018-07-01 |         48 | 1702 |       15 |  40475 |  180 |    57 |
+| 2018-08-01 |         52 | 1050 |       15 |  27962 |  120 |    60 |
+| 2018-09-01 |         55 | 1117 |       15 |  29148 |  126 |    63 |
+| 2018-10-01 |         55 |  184 |       10 |   6225 |   23 |    63 |
+
 
 
 ** Reps last 6 months
-#+header: :var value="reps"
-#+header: :var time="month"
-#+header: :var months=6
+
+#+header: :var value="reps" period="month" months=6 muscle="all" exercise="all"
 #+begin_src python :session plots :results file :exports results
-filename = fit_path + "/../data/reps.png"
-graph.draw_line_graph(trains, value, time, months, "all", filename)
-filename
+graph.draw_line_graph(trains, value, period, months, muscle, exercise, data_path)
 #+end_src
 
 #+RESULTS:
-[[file:/home/guancio/Sources/org-fit/cli/../data/reps.png]]
+[[file:/home/guancio/Sources/org-fit/data/4.png]]
 
 
 ** Reps Abs last 6 months
-#+header: :var value="reps"
-#+header: :var time="month"
-#+header: :var months=6
+
+#+header: :var value="reps" period="month" months=6 muscle="Abs" exercise="all"
 #+begin_src python :session plots :results file :exports results
-filename = fit_path + "/../data/abs-reps.png"
-graph.draw_line_graph(trains, value, time, months, "Abs", filename)
-filename
+graph.draw_line_graph(trains, value, period, months, muscle, exercise, data_path)
 #+end_src
 
 #+RESULTS:
-[[file:/home/guancio/Sources/org-fit/cli/../data/abs-reps.png]]
+[[file:/home/guancio/Sources/org-fit/data/1.png]]
+
+** 1RM Flat Barbell Bench Press
+
+#+header: :var value="epley" period="day" months="all" muscle="all" exercise="Flat Barbell Bench Press"
+#+begin_src python :session plots :results file :exports results
+graph.draw_line_graph(trains, value, period, months, muscle, exercise, data_path)
+#+end_src
+
+#+RESULTS:
+[[file:/home/guancio/Sources/org-fit/data/5.png]]
+
+
+#+header: :var period="month" months="all" muscle="all" exercise="Flat Barbell Bench Press"
+#+begin_src python :session plots :results value :exports results
+graph.get_summary(trains, period, months, muscle, exercise)
+#+end_src
+
+#+RESULTS:
+|       date | max-weight | reps | max-reps | volume | sets | epley |
+| 2018-01-01 |         11 |   76 |       15 |    800 |    6 |    16 |
+| 2018-02-01 |         20 |  125 |       15 |   2100 |    9 |    30 |
+| 2018-03-01 |         25 |  127 |       14 |   2985 |   11 |    36 |
+| 2018-04-01 |         30 |  127 |       13 |   3188 |   12 |    40 |
+| 2018-05-01 |         35 |   78 |       10 |   2180 |    8 |    47 |
+| 2018-06-01 |         35 |  116 |       10 |   3285 |   12 |    44 |
+| 2018-07-01 |         38 |  180 |       10 |   5455 |   20 |    48 |
+| 2018-08-01 |         38 |  132 |       10 |   4100 |   15 |    48 |
+| 2018-09-01 |         40 |  127 |       10 |   4130 |   15 |    51 |
 
 
 * Breakdown
 ** Reps By muscle last month
-#+header: :var value="reps"
-#+header: :var period="month"
+
+#+header: :var value="reps" period="month" 
 #+begin_src python :session plots :results file :exports results
-filename = fit_path + "/../data/bd-reps.png"
-graph.draw_pie_graph(trains, value, period, filename)
-filename
+graph.draw_pie_graph(trains, value, period, data_path)
 #+end_src
 
 #+RESULTS:
-[[file:/home/guancio/Sources/org-fit/cli/../data/bd-reps.png]]
+[[file:/home/guancio/Sources/org-fit/data/13.png]]
+
+
+
+#+header: :var value="vol" period="week" 
+#+begin_src python :session plots :results value table :exports results
+graph.get_breakout(trains, value, period)
+#+end_src
+
+#+RESULTS:
+| Abs       | 20% |
+| Back      | 18% |
+| Legs      | 27% |
+| Shoulders | 16% |
+| Triceps   | 19% |
+
 
 
 ** Vol By muscle last week
-#+header: :var value="vol"
-#+header: :var period="week"
+
+#+header: :var value="vol" period="week" 
 #+begin_src python :session plots :results file :exports results
-filename = fit_path + "/../data/bd-vol.png"
-graph.draw_pie_graph(trains, value, period, filename)
-filename
+graph.draw_pie_graph(trains, value, period, data_path)
 #+end_src
 
 #+RESULTS:
-[[file:/home/guancio/Sources/org-fit/cli/../data/bd-vol.png]]
+[[file:/home/guancio/Sources/org-fit/data/16.png]]
+
 
 
 * Workouts
@@ -81,104 +132,20 @@ filename
 
 
 
-#+name: muscles
-#+begin_src python :session plots :exports none :results output
-graph.get_all_muscles(trains)
-#+end_src
-
-#+RESULTS: muscles
-: count  date  weight
-: muscle                        
-: Abs          235   235     127
-: Back         200   200     200
-: Biceps        83    83      83
-: Chest        130   130     130
-: Legs         183   183     180
-: Shoulders    107   107     107
-: Triceps       40    40      40
-
-
-
-
-
-
-#+RESULTS:
-[[file:/home/guancio/Sources/org-fit/data/13.png]]
-
-
-
-#+header: :var value="sets" period="day" months="all" muscle="all"
 #+begin_src python :session plots :results file :exports results
-graph.draw_line_graph(trains, value, period, months, muscle, data_path)
+  import pandas as pd
+  import numpy as np
+  import matplotlib.pyplot as plt
+  values = graph.prepare_data(trains, "month", "all", "all", "all")
+  values["volume"] = 0
+  values["reps"] = 0
+  fig, ax = plt.subplots(nrows=1, ncols=1)
+  ax.plot(values)
+  filename = graph.get_file_name("/tmp/a.png")
+  fig.savefig(filename)
+  plt.close(fig)
+  filename
 #+end_src
 
 #+RESULTS:
-[[file:/home/guancio/Sources/org-fit/data/58.png]]
-
-
-#+header: :var value="reps" period="month" 
-#+begin_src python :session plots :results file :exports results
-graph.draw_pie_graph(trains, value, period, data_path)
-#+end_src
-
-#+RESULTS:
-[[file:/home/guancio/Sources/org-fit/data/59.png]]
-#+begin_src python :session plots :results value table :exports results
-import pandas as pd
-import numpy as np
-to_process = trains.copy()
-to_process = to_process.set_index('date')
-to_process= to_process.sort_index()
-filtered = to_process
-filtered = to_process
-
-filtered['volume'] = filtered['weight'] * filtered['count']
-filtered.set_index('muscle')
-filtered['reps'] = filtered['count']
-grouped = filtered.groupby('muscle')
-values = grouped.agg({'volume': np.sum})
-[x.split(',') for x in values.to_csv().split('\n')]
-#+end_src
-
-#+RESULTS:
-| muscle    |  volume |
-| Abs       | 43277.5 |
-| Back      | 58853.8 |
-| Biceps    | 12550.0 |
-| Chest     | 35488.5 |
-| Legs      | 40050.0 |
-| Shoulders | 21707.5 |
-| Triceps   | 12502.0 |
-|           |         |
-
-
-#+begin_src python :session plots :results value table :exports results
-to_process = trains.copy()
-to_process = to_process.set_index('date')
-to_process= to_process.sort_index()
-group_freq = 'MS'
-to_process['volume'] = to_process['weight'] * to_process['count']
-to_process['reps'] = to_process['count']
-grouped = to_process.groupby(pd.Grouper(freq=group_freq))
-values = grouped.agg({
-  'count': np.size,
-  'reps': np.sum,
-  'volume': np.sum})
-k = values.keys()[0]
-values = values[values[k] > 0]
-[x.split(',') for x in values.to_csv().split('\n')]
-#+end_src
-
-#+RESULTS:
-|       date | count |  volume |   reps |
-| 2018-01-01 |  30.0 |  7133.0 |  343.0 |
-| 2018-02-01 |  75.0 | 16695.5 |  840.0 |
-| 2018-03-01 |  93.0 | 20857.0 | 1017.0 |
-| 2018-04-01 | 163.0 | 37208.5 | 1663.0 |
-| 2018-05-01 |  64.0 | 13150.0 |  690.0 |
-| 2018-06-01 | 104.0 | 25575.0 | 1092.0 |
-| 2018-07-01 | 180.0 | 40475.2 | 1702.0 |
-| 2018-08-01 | 120.0 | 27961.5 | 1050.0 |
-| 2018-09-01 | 126.0 | 29148.4 | 1117.0 |
-| 2018-10-01 |  23.0 |  6225.2 |  184.0 |
-|            |       |         |        |
+[[file:/tmp/a.png]]

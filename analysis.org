@@ -3,15 +3,36 @@
 
 * History
 
-#+header: :var value="reps" period="month" months="all" muscle="all"
+
+#+header: :var value="reps" period="month" months="all" muscle="all" exercise="all"
 #+begin_src python :session plots :results file :exports results
-graph.draw_line_graph(trains, value, period, months, muscle, data_path)
+graph.draw_line_graph(trains, value, period, months, muscle, exercise, data_path)
 #+end_src
 
 #+RESULTS:
-[[file:/home/guancio/Sources/org-fit/data/2.png]]
+[[file:/home/guancio/Sources/org-fit/data/14.png]]
+
+
+#+header: :var period="month" months="all" muscle="all" exercise="all"
+#+begin_src python :session plots :results value :exports results
+graph.get_summary(trains, period, months, exercise, muscle)
+#+end_src
+
+#+RESULTS:
+|       date | max-weight | reps | max-reps | volume | sets | epley |
+| 2018-01-01 |         60 |  343 |       15 |   7133 |   30 |    88 |
+| 2018-02-01 |         69 |  840 |       16 |  16696 |   75 |    83 |
+| 2018-03-01 |         38 | 1017 |       16 |  20857 |   93 |    50 |
+| 2018-04-01 |         41 | 1663 |       14 |  37208 |  163 |    53 |
+| 2018-05-01 |         38 |  690 |       15 |  13150 |   64 |    50 |
+| 2018-06-01 |         41 | 1092 |       15 |  25575 |  104 |    55 |
+| 2018-07-01 |         48 | 1702 |       15 |  40475 |  180 |    57 |
+| 2018-08-01 |         52 | 1050 |       15 |  27962 |  120 |    60 |
+| 2018-09-01 |         55 | 1117 |       15 |  29148 |  126 |    63 |
+| 2018-10-01 |         55 |  184 |       10 |   6225 |   23 |    63 |
 
 * Breakout
+
 
 #+header: :var value="reps" period="month" 
 #+begin_src python :session plots :results file :exports results
@@ -19,7 +40,19 @@ graph.draw_pie_graph(trains, value, period, data_path)
 #+end_src
 
 #+RESULTS:
-[[file:/home/guancio/Sources/org-fit/data/9.png]]
+[[file:/home/guancio/Sources/org-fit/data/15.png]]
+
+#+header: :var value="reps" period="month" 
+#+begin_src python :session plots :results value table :exports results
+graph.get_breakout(trains, value, period)
+#+end_src
+
+#+RESULTS:
+| Abs       | 18% |
+| Back      | 18% |
+| Legs      | 22% |
+| Shoulders | 23% |
+| Triceps   | 18% |
 
 * Workouts
-#+INCLUDE: "example.org" :minlevel 2
+  #+INCLUDE: "example.org" :minlevel 2

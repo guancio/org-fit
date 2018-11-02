@@ -116,13 +116,17 @@ are produced by manipulating org-babel snippets.
 
 - To start the org-fit execute =org-fit-start=.
 - To add a graph for historical data execute =org-fit-add-graph-history=
+- To add a table for historical data execute =org-fit-add-table-summary=
 - To add a pie chart graph execute =org-fit-add-graph-breakout=
+- To add a table for breakout data execute =org-fit-add-table-breakout=
 - You can update a graph by moving the cursor in the corresponding
   org-babel fragment and use the following keybinding
  - =C-q 1= display volume (i.e. kg * reps)
- - =C-q 2= display reps
- - =C-q 3= display number of workouts
+ - =C-q 2= display reps 
+ - =C-q 3= display max weight
  - =C-q 4= display sets
+ - =C-q 5= display max reps
+ - =C-q 6= display 1RM Epley formula
  - =C-w 1= group per month
  - =C-w 2= group per week
  - =C-w 3= group per day
@@ -131,3 +135,11 @@ are produced by manipulating org-babel snippets.
  - =C-e 3= limit results to three months
  - =C-e 6= limit results to six month
  - =C-e 0= no time limit
+ - =C-e e= filter per exercise
+ - =C-e 0= filter per muscle
+
+* Work in progress
+- breakout graph per exercise
+- selection of time range for breakout graph
+- Import/merging
+- Compute additional data per workout
