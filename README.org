@@ -7,7 +7,7 @@ closed source license of Runalyze.
 
 [[file:screen.png]]
 
-[[file:export-web.png]]
+[[file:export-html.png]]
 
 The architecture consists of three components:
 - org-mode (actually the org-mode text format) to store data in human
