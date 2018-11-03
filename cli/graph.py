@@ -120,7 +120,7 @@ def get_summary(trains, groupby, months, muscle, exercise):
         [i.strftime('%Y-%m-%d')] + ["{:.0f}".format(r[k]) for k in values.keys()]
         for (i,r) in values.iterrows()]
     
-def get_breakout(trains, value, period):
+def get_breakout(trains, period):
     values = prepare_breakout_data(trains, period)
 
     for k in values.keys():
