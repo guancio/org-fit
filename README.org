@@ -45,7 +45,7 @@ have the following optional properties :
  ** Rowing Machine
 :PROPERTIES:
 :muscle: Cardio 
-:time: 0:15:39 
+:duration: 0:15:39 
 :distance: 3200.0 m
 :END:
 #+END_EXAMPLE

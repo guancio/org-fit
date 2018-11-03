@@ -69,8 +69,8 @@ graph.get_breakout(trains, value, period)
   (org-babel-execute-src-block)
   )
 
-
-(defun org-fit-graph-change-attr (attr val)
+;; Problems with spaces
+(defun org-fit-graph-change-attr-no-exec (attr val)
   ;; (save-excursion
   (goto-char (org-babel-where-is-src-block-head))
   (if (looking-at-p "#\\+begin_src")
@@ -89,9 +89,20 @@ graph.get_breakout(trains, value, period)
                )
           (delete-region (point) (line-end-position))
           (insert new-var-str)
-          (org-babel-execute-src-block)
       ))
   ))
+
+
+
+(defun org-fit-graph-change-attr (attr val)
+  ;; (save-excursion
+  (goto-char (org-babel-where-is-src-block-head))
+  (if (looking-at-p "#\\+begin_src")
+      (progn
+        (org-fit-graph-change-attr-no-exec attr val)
+        (org-babel-execute-src-block)
+      ))
+  )
 
 (defun org-fit-get-all-muscles ()
   (cons "all"
@@ -105,6 +116,7 @@ graph.get_breakout(trains, value, period)
 
 (defun org-fit-select-muscle ()
   (interactive)
+  (org-fit-graph-change-attr-no-exec "exercise" "\"all\"")
   (org-fit-graph-change-attr
    "muscle"
    (format "\"%s\"" (completing-read "Muscle:" (org-fit-get-all-muscles)))))
@@ -121,6 +133,7 @@ graph.get_breakout(trains, value, period)
 
 (defun org-fit-select-exercise ()
   (interactive)
+  (org-fit-graph-change-attr-no-exec "muscle" "\"all\"")
   (org-fit-graph-change-attr
    "exercise"
    (format "\"%s\"" (completing-read "Exercise:" (org-fit-get-all-exercises)))))
@@ -151,33 +164,53 @@ graph.get_breakout(trains, value, period)
  )
  
 
+;; (require 'seq)
 
-;; (defhydra hydra-vi (:hint nil)
-;;   "vi"
-;;   ("j" next-line)
-;;   ("k" previous-line)
-;;   ("n" next-line)
-;;   ("p" previous-line))
 
-;; (setq hydra-vi/hint
-;;       '(if (evenp (line-number-at-pos))
-;;         (prog1 (eval
-;;                 (hydra--format nil '(nil nil :hint nil)
-;;                                "\neven: _j_ _k_\n" hydra-vi/heads))
-;;           (define-key hydra-vi/keymap "n" nil)
-;;           (define-key hydra-vi/keymap "p" nil)
-;;           (define-key hydra-vi/keymap "j" 'hydra-vi/next-line)
-;;           (define-key hydra-vi/keymap "k" 'hydra-vi/previous-line))
-;;         (prog1 (eval
-;;                 (hydra--format nil '(nil nil :hint nil)
-;;                                "\nodd: _n_ _p_\n" hydra-vi/heads))
-;;           (define-key hydra-vi/keymap "j" nil)
-;;           (define-key hydra-vi/keymap "k" nil)
-;;           (define-key hydra-vi/keymap "n" 'hydra-vi/next-line)
-;;           (define-key hydra-vi/keymap "p" 'hydra-vi/previous-line))))
+;; (defun org-fit-graph-get-attr (attr)
+;;   (goto-char (org-babel-where-is-src-block-head))
+;;   (if (looking-at-p "#\\+begin_src")
+;;       (progn
+;;         (re-search-backward "#\\+header: :var" nil t)
+;;         (re-search-forward ":var +" nil t)
+;;         (let* ((var-str (buffer-substring-no-properties (point) (line-end-position)))
+;;                (var-ass (split-string var-str " "))
+;;                (var-vals (mapcar (lambda (x) (split-string x "=")) var-ass)))
+;;           (cadr (car (seq-filter (lambda (x) (equal (car x) attr)) var-vals)))
+;;       ))
+;;   ))
 
-;; (hydra-vi/body)
-;; (hydra-vi/body)
+
+;; (defun org-fit-cycle-value (value)
+;;   (cond
+;;    ((equal value "reps" "volume")
+;;     (equal value "volume" "sets")
+;;     (equal value "sets" "reps"))))
+
+;; (defhydradio hydra-fit ()
+;;   (velue "Value." ["reps" "volume" "sets"])
+;;   (period "Period." ["day" "week" "month"]))
+
+;; (defhydra hydra-fit (:hint nil)
+;;   "
+;; _v_ value:    % -15`hydra-fit/value^^^
+;; _p_ period:   % -15`hydra-fit/period
+;; "
+;;   ("v" (hydra-fit/value) nil)
+;;   ("p" nil)
+;;   ("q" nil "quit"))
+
+;; (defun org-fit-popup ()
+;;   (interactive
+;;    (progn
+;;      (setq hydra-fit/value (org-fit-graph-get-attr "value"))
+;;      (setq hydra-fit/period "day")
+;;      (hydra-fit/body))))
+
+;; (general-define-key
+;;  :keymaps 'org-mode-map
+;;  "C-q" 'org-fit-popup)
+
 (provide 'gym)
 
 

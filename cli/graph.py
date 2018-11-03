@@ -69,14 +69,14 @@ def draw_line_graph(trains, value, groupby, months, muscle, exercise, filename):
     fig, ax = plt.subplots(nrows=1, ncols=1)
     ax.plot(to_plot[value])
     #plt.title(value)
-    #plt.legend()
+    plt.legend()
     filename = get_file_name(filename)
     fig.savefig(filename)
     plt.close(fig)
     return filename
 
 
-def draw_pie_graph(trains, value, period, filename):
+def prepare_breakout_data(trains, period):
     to_process = trains.copy()
     to_process = to_process.set_index('date')
     to_process= to_process.sort_index()
@@ -93,28 +93,21 @@ def draw_pie_graph(trains, value, period, filename):
     filtered['volume'] = filtered['weight'] * filtered['count']
     filtered.set_index('muscle')
     filtered['reps'] = filtered['count']
-     
-    if (value != "count"):
-        grouped = filtered.groupby('muscle')
-        if value == "sets":
-            values = grouped.agg({'count': np.size})
-        elif value == "reps":
-            values = grouped.agg({'reps': np.sum})
-        elif value == "vol":
-            values = grouped.agg({'volume': np.sum})
-        else:
-            values = None
-    else:
-        return None
-        grouped = to_process.groupby(pd.Grouper(freq='D'))
-        values = grouped.agg({'count': np.size})
-        values = values[values['count'] > 0]
-        grouped2 = values.groupby('muscle')
-        values = grouped2.agg({'count': np.size})
+    filtered['sets'] = filtered['count']
+    grouped = filtered.groupby('muscle')
+    values = grouped.agg({
+        'sets': np.size,
+        'reps' : np.sum,
+        'volume' : np.sum
+    })
+    return values
+    
+def draw_pie_graph(trains, value, period, filename):
+    values = prepare_breakout_data(trains, period)
      
     fig, ax = plt.subplots(nrows=1, ncols=1)
     plt.axis('equal')
-    ax.pie(values, autopct='%1.0f%%', labels=values.index.values)
+    ax.pie(values[value], autopct='%1.0f%%', labels=values.index.values)
     plt.title(value)
     filename = get_file_name(filename)
     fig.savefig(filename)
@@ -128,37 +121,13 @@ def get_summary(trains, groupby, months, muscle, exercise):
         for (i,r) in values.iterrows()]
     
 def get_breakout(trains, value, period):
-    to_process = trains.copy()
-    to_process = to_process.set_index('date')
-    to_process= to_process.sort_index()
-    filtered = to_process
-    if period == "week":
-        filtered = to_process.last('1M')
-    elif period == "month":
-        filtered = to_process.last('1W')
-    elif period == "all":
-        filtered = to_process
-    else:
-        return None
-     
-    filtered['volume'] = filtered['weight'] * filtered['count']
-    filtered.set_index('muscle')
-    filtered['reps'] = filtered['count']
-    grouped = filtered.groupby('muscle')
-    values = None
-    if value == "sets":
-        values = grouped.agg({'count': np.size})
-    elif value == "reps":
-        values = grouped.agg({'reps': np.sum})
-    elif value == "vol":
-        values = grouped.agg({'volume': np.sum})
-    else:
-        values = None
-     
-    k = values.keys()[0]
-    values[k] = values[k] / values.sum()[0]
-    return [(i, "{0:.0%}".format(r[k])) for (i,r) in values.iterrows()]
+    values = prepare_breakout_data(trains, period)
 
+    for k in values.keys():
+        values[k] = values[k] / values.sum()[k]
+    return [["muscle"] + list(values.keys())] + [
+        [i] + ["{0:.0%}".format(r[k]) for k in values.keys()]
+        for (i,r) in values.iterrows()]
 
 if (0):
     to_process = trains.copy()
