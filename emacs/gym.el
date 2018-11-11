@@ -145,7 +145,26 @@ graph.get_breakout(trains, period)
    (format "\"%s\"" (completing-read "Exercise:" (org-fit-get-all-exercises)))))
 
 
- 
+
+;; https://stackoverflow.com/questions/6666862/org-mode-go-back-from-sparse-tree-to-previous-visibility/44158824#44158824
+(defun org-fit-extend-file ()
+  (interactive)
+  (let ((buf (find-file-noselect org-fit-data-file)))
+    (if (not (buffer-modified-p buf))
+        (progn
+          (funcall 
+           (intern (concat "org-babel-execute:" "python"))
+           "import extender
+extender.extend_gym_file(org_file)"
+           (org-combine-plists
+            '((:colname-names) (:rowname-names) (:result-params "replace") (:result-type . value) (:results . "replace") (:exports . "none") (:session . "plots") (:tangle . "no") (:hlines . "no") (:noweb . "no") (:cache . "no"))
+            ))
+          (with-current-buffer buf
+            (revert-buffer :ignore-auto :noconfirm))
+  ))))
+
+
+
 
 (require 'hydra)
 

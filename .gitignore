@@ -1,0 +1,12 @@
+*.html
+*.pdf
+*.tex
+/auto/analysis.el
+/auto/graphs.el
+*.pyc
+/.tcx.png
+/data/1.png
+/data/10.png
+/old-stuff.org
+/org-fit.org
+/python_version.org
