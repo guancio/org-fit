@@ -69,29 +69,43 @@ graph.get_breakout(trains, period)
   (org-babel-execute-src-block)
   )
 
-;; Problems with spaces
-(defun org-fit-graph-change-attr-no-exec (attr val)
+(defun org-fit-get-vars ()
+  (mapcar #'cdr 
+          (seq-filter (lambda (x) (eq (car x) :var)) (third (org-babel-get-src-block-info)))))
+
+(defun org-fit-graph-get-attr (properties attr)
+  (cdr (car (seq-filter (lambda (x) (eq (car x) attr)) properties))))
+
+
+(defun org-fit-quote-parameter (value)
+  (cond
+   ((eq nil value) "null")
+   ((numberp value)
+    (format "%d" value))
+   (t (format "\"%s\"" value))))
+
+(defun org-fit-graph-props-change-attr (props attr value)
+  (mapcar (lambda (x) (if (eq (car x) attr) (append (list attr) value) x))
+          props))
+(defun org-fit-graph-props-to-str (props)
+  (string-join (mapcar (lambda (x) (concat (symbol-name (car x)) "=" (org-fit-quote-parameter (cdr x))))
+                       props)
+               " "))
+
+;; More efficient if we do this for sevral parameters-
+(defun org-fit-graph-change-attr-no-exec (attr value)
   ;; (save-excursion
   (goto-char (org-babel-where-is-src-block-head))
   (if (looking-at-p "#\\+begin_src")
       (progn
         (re-search-backward "#\\+header: :var" nil t)
         (re-search-forward ":var +" nil t)
-        (let* ((var-str (buffer-substring-no-properties (point) (line-end-position)))
-               (var-ass (split-string var-str " "))
-               (var-vals (mapcar (lambda (x) (split-string x "=")) var-ass))
-               (new-var-vals (mapcar (lambda (x)
-                                      (if (equal (car x) attr)
-                                          (list attr val)
-                                        x)) var-vals))
-               (new-var-ass (mapcar (lambda (x) (string-join x "=")) new-var-vals))
-               (new-var-str (string-join new-var-ass " "))
-               )
+        (let* ((props (org-fit-get-vars))
+               (new-var-str (org-fit-graph-props-to-str (org-fit-graph-props-change-attr props attr value))))
           (delete-region (point) (line-end-position))
           (insert new-var-str)
       ))
   ))
-
 
 
 (defun org-fit-update-graph ()
@@ -120,12 +134,6 @@ graph.get_breakout(trains, period)
                         )) ","))
   )
 
-(defun org-fit-select-muscle ()
-  (interactive)
-  (org-fit-graph-change-attr-no-exec "exercise" "\"all\"")
-  (org-fit-graph-change-attr
-   "muscle"
-   (format "\"%s\"" (completing-read "Muscle:" (org-fit-get-all-muscles)))))
 
 (defun org-fit-get-all-exercises ()
   (cons "all"
@@ -136,14 +144,6 @@ graph.get_breakout(trains, period)
                         '((:colname-names) (:rowname-names) (:result-params "replace") (:result-type . value) (:results . "replace") (:exports . "none") (:session . "plots") (:tangle . "no") (:hlines . "no") (:noweb . "no") (:cache . "no"))
                         )) ","))
   )
-
-(defun org-fit-select-exercise ()
-  (interactive)
-  (org-fit-graph-change-attr-no-exec "muscle" "\"all\"")
-  (org-fit-graph-change-attr
-   "exercise"
-   (format "\"%s\"" (completing-read "Exercise:" (org-fit-get-all-exercises)))))
-
 
 
 ;; https://stackoverflow.com/questions/6666862/org-mode-go-back-from-sparse-tree-to-previous-visibility/44158824#44158824
@@ -163,65 +163,41 @@ extender.extend_gym_file(org_file)"
             (revert-buffer :ignore-auto :noconfirm))
   ))))
 
+(defun org-import-file (csv-file)
+  (let ((buf (find-file-noselect org-fit-data-file)))
+    (if (not (buffer-modified-p buf))
+        (progn
+          (funcall 
+           (intern (concat "org-babel-execute:" "python"))
+           (format "import csvimport
+csvimport.import_csv(\"%s\",  org_file)" csv-file)
+           (org-combine-plists
+            '((:colname-names) (:rowname-names) (:result-params "replace") (:result-type . value) (:results . "replace") (:exports . "none") (:session . "plots") (:tangle . "no") (:hlines . "no") (:noweb . "no") (:cache . "no"))
+            ))
+          (with-current-buffer buf
+            (revert-buffer :ignore-auto :noconfirm))
+  ))))
 
 
 
 (require 'hydra)
 
-(defun org-fit-graph-get-attr (attr)
-  (goto-char (org-babel-where-is-src-block-head))
-  (if (looking-at-p "#\\+begin_src")
-      (progn
-        (re-search-backward "#\\+header: :var" nil t)
-        (re-search-forward ":var +" nil t)
-        (let* ((var-str (buffer-substring-no-properties (point) (line-end-position)))
-               (var-ass (split-string var-str " "))
-               (var-vals (mapcar (lambda (x) (split-string x "=")) var-ass)))
-          (cadr (car (seq-filter (lambda (x) (equal (car x) attr)) var-vals)))
-      ))
-  ))
 
-(defun fit-unquote-parameter (value)
-  (cond
-   ((> (string-to-number value) 0)
-    (string-to-number value))
-   (value
-    (let ((v1 (split-string value "\"")))
-      (if (eq 1 (length v1))
-          value
-        (cadr v1))))
-   (t nil)
-   ))
-
-(defun fit-quote-parameter (value)
-  (cond
-   ((numberp value)
-    (format "%d" value))
-   (t (format "\"%s\"" value))))
 
 
 (defun fit-hydra-update ()
   (interactive)
-  (org-fit-graph-change-attr-no-exec
-   "period"
-   (fit-quote-parameter hydra-fit/period))
-  (org-fit-graph-change-attr-no-exec
-   "value"
-   (fit-quote-parameter hydra-fit/value))
-  (org-fit-graph-change-attr-no-exec
-   "months"
-   (fit-quote-parameter hydra-fit/months))
-  (org-fit-graph-change-attr-no-exec
-   "muscle"
-   (fit-quote-parameter hydra-fit/muscle))
-  (org-fit-graph-change-attr-no-exec
-   "exercise"
-   (fit-quote-parameter hydra-fit/exercise))
-   (org-fit-update-graph)
+  (org-fit-graph-change-attr-no-exec 'period hydra-fit/period)
+  (org-fit-graph-change-attr-no-exec 'value hydra-fit/value)
+  (org-fit-graph-change-attr-no-exec 'months hydra-fit/months)
+  (org-fit-graph-change-attr-no-exec 'muscle hydra-fit/muscle)
+  (org-fit-graph-change-attr-no-exec 'exercise hydra-fit/exercise)
+  (org-fit-update-graph)
 )
 
 (defhydradio hydra-fit ()
-  (value "Metric to display" ["volume" "reps" "max-weight" "sets" "max-reps" "epley"])
+  (value "Metric to display" ["volume" "reps" "max-weight" "sets" "max-reps" "epley"
+                              "duration" "distance" "speed"])
   (period "Period to group by" ["day" "week" "month" "all"])
   (months "Months" ["all" 1 2 3 4 5 6 7 8 9])
   (muscle "Filter by muscle" ["all"])
@@ -257,12 +233,30 @@ _v_alue: % -15`hydra-fit/value _p_eriod: % -15`hydra-fit/period months (0..9/y):
 
 (defun fit-open-hydra ()
   (interactive)
-  (setq hydra-fit/value (fit-unquote-parameter (org-fit-graph-get-attr "value")))
-  (setq hydra-fit/period (fit-unquote-parameter (org-fit-graph-get-attr "period")))
-  (setq hydra-fit/months (fit-unquote-parameter (org-fit-graph-get-attr "months")))
-  (setq hydra-fit/muscle (fit-unquote-parameter (org-fit-graph-get-attr "muscle")))
-  (setq hydra-fit/exercise (fit-unquote-parameter (org-fit-graph-get-attr "exercise")))
+  (let ((properties (org-fit-get-vars)))
+    (progn
+      (setq hydra-fit/value (org-fit-graph-get-attr properties 'value))
+      (setq hydra-fit/period (org-fit-graph-get-attr properties 'period))
+      (setq hydra-fit/months (org-fit-graph-get-attr properties 'months))
+      (setq hydra-fit/muscle (org-fit-graph-get-attr properties 'muscle))
+      (setq hydra-fit/exercise (org-fit-graph-get-attr properties 'exercise))))
   (hydra-fit/body))
+
+(define-key org-mode-map (kbd "C-q") 'fit-open-hydra)
+
+;; (defun org-fit-select-muscle ()
+;;   (interactive)
+;;   (org-fit-graph-change-attr-no-exec "exercise" "\"all\"")
+;;   (org-fit-graph-change-attr
+;;    "muscle"
+;;    (format "\"%s\"" (completing-read "Muscle:" (org-fit-get-all-muscles)))))
+;; (defun org-fit-select-exercise ()
+;;   (interactive)
+;;   (org-fit-graph-change-attr-no-exec "muscle" "\"all\"")
+;;   (org-fit-graph-change-attr
+;;    "exercise"
+;;    (format "\"%s\"" (completing-read "Exercise:" (org-fit-get-all-exercises)))))
+
 
 ;; (general-define-key
 ;;  :keymaps 'org-mode-map
@@ -288,7 +282,6 @@ _v_alue: % -15`hydra-fit/value _p_eriod: % -15`hydra-fit/period months (0..9/y):
 ;;  "C-e e" 'org-fit-select-exercise
 ;;  )
 
-(define-key org-mode-map (kbd "C-q") 'fit-open-hydra)
 
 (provide 'gym)
 

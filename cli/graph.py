@@ -38,14 +38,16 @@ def prepare_data(trains, groupby, months, muscle, exercise):
         'sets': np.size,
         'reps' : np.sum,
         'volume' : np.sum,
+        'distance' : np.sum,
+        'duration' : np.sum,
         'max-weight' : np.max,
         'max-reps' : np.max,
         # rep max: TODO
         'epley' : np.max
     })
+    values["speed"] = values["distance"] / values["duration"] * 3.6
 
-    k = values.keys()[0]
-    values = values[values[k] > 0]
+    values = values[values["sets"] > 0]
     return values
 
 def get_all_muscles(trains):
@@ -98,7 +100,9 @@ def prepare_breakout_data(trains, period):
     values = grouped.agg({
         'sets': np.size,
         'reps' : np.sum,
-        'volume' : np.sum
+        'volume' : np.sum,
+        'distance' : np.sum,
+        'duration' : np.sum
     })
     return values
     

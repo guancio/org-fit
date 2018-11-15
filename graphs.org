@@ -6,13 +6,13 @@
 
 ** Volume last 12 months
 
-#+header: :var value="volume" period="month" months="all" muscle="all" exercise="all"
+#+header: :var value="volume" period="month" months="all" muscle="all" exercise="Barbell Row"
 #+begin_src python :session plots :results file :exports results
 graph.draw_line_graph(trains, value, period, months, muscle, exercise, data_path)
 #+end_src
 
 #+RESULTS:
-[[file:/home/guancio/Sources/org-fit/data/7.png]]
+[[file:/home/guancio/Sources/org-fit/data/10.png]]
 
 
 #+header: :var period="month" months="all" muscle="all" exercise="all"
@@ -21,17 +21,17 @@ graph.get_summary(trains, period, months, muscle, exercise)
 #+end_src
 
 #+RESULTS:
-|       date | max-weight | reps | max-reps | volume | sets | epley |
-| 2018-01-01 |         60 |  343 |       15 |   7133 |   30 |    88 |
-| 2018-02-01 |         69 |  840 |       16 |  16696 |   75 |    83 |
-| 2018-03-01 |         38 | 1017 |       16 |  20857 |   93 |    50 |
-| 2018-04-01 |         41 | 1663 |       14 |  37208 |  163 |    53 |
-| 2018-05-01 |         38 |  690 |       15 |  13150 |   64 |    50 |
-| 2018-06-01 |         41 | 1092 |       15 |  25575 |  104 |    55 |
-| 2018-07-01 |         48 | 1702 |       15 |  40475 |  180 |    57 |
-| 2018-08-01 |         52 | 1050 |       15 |  27962 |  120 |    60 |
-| 2018-09-01 |         55 | 1117 |       15 |  29148 |  126 |    63 |
-| 2018-10-01 |         55 |  184 |       10 |   6225 |   23 |    63 |
+|       date | volume | distance | max-weight | sets | duration | reps | epley | max-reps | speed |
+| 2018-01-01 |   7133 |     3200 |         60 |   31 |      939 |  344 |    88 |       15 |    12 |
+| 2018-02-01 |  16696 |    14800 |         69 |   82 |     4423 |  847 |    83 |       16 |    12 |
+| 2018-03-01 |  20857 |     4000 |         38 |   98 |     3719 | 1022 |    50 |       16 |     4 |
+| 2018-04-01 |  37208 |     8000 |         41 |  170 |     3937 | 1670 |    53 |       14 |     7 |
+| 2018-05-01 |  13150 |     4000 |         38 |   68 |     1880 |  694 |    50 |       15 |     8 |
+| 2018-06-01 |  25575 |     2500 |         41 |  109 |     2225 | 1097 |    55 |       15 |     4 |
+| 2018-07-01 |  40475 |     7000 |         48 |  187 |     2657 | 1709 |    57 |       15 |     9 |
+| 2018-08-01 |  27962 |     4000 |         52 |  125 |     2182 | 1055 |    60 |       15 |     7 |
+| 2018-09-01 |  29148 |    11870 |         55 |  132 |     4441 | 1123 |    63 |       15 |    10 |
+| 2018-10-01 |  28898 |    11810 |         55 |  123 |     4201 | 1039 |    67 |       15 |    10 |
 
 
 
@@ -43,7 +43,7 @@ graph.draw_line_graph(trains, value, period, months, muscle, exercise, data_path
 #+end_src
 
 #+RESULTS:
-[[file:/home/guancio/Sources/org-fit/data/4.png]]
+[[file:/home/guancio/Sources/org-fit/data/3.png]]
 
 
 ** Reps Abs last 6 months
@@ -54,7 +54,7 @@ graph.draw_line_graph(trains, value, period, months, muscle, exercise, data_path
 #+end_src
 
 #+RESULTS:
-[[file:/home/guancio/Sources/org-fit/data/1.png]]
+[[file:/home/guancio/Sources/org-fit/data/4.png]]
 
 ** 1RM Flat Barbell Bench Press
 
@@ -73,54 +73,104 @@ graph.get_summary(trains, period, months, muscle, exercise)
 #+end_src
 
 #+RESULTS:
-|       date | max-weight | reps | max-reps | volume | sets | epley |
-| 2018-01-01 |         11 |   76 |       15 |    800 |    6 |    16 |
-| 2018-02-01 |         20 |  125 |       15 |   2100 |    9 |    30 |
-| 2018-03-01 |         25 |  127 |       14 |   2985 |   11 |    36 |
-| 2018-04-01 |         30 |  127 |       13 |   3188 |   12 |    40 |
-| 2018-05-01 |         35 |   78 |       10 |   2180 |    8 |    47 |
-| 2018-06-01 |         35 |  116 |       10 |   3285 |   12 |    44 |
-| 2018-07-01 |         38 |  180 |       10 |   5455 |   20 |    48 |
-| 2018-08-01 |         38 |  132 |       10 |   4100 |   15 |    48 |
-| 2018-09-01 |         40 |  127 |       10 |   4130 |   15 |    51 |
+|       date | volume | distance | max-weight | sets | duration | reps | epley | max-reps | speed |
+| 2018-01-01 |    800 |        0 |         11 |    6 |        0 |   76 |    16 |       15 |   nan |
+| 2018-02-01 |   2100 |        0 |         20 |    9 |        0 |  125 |    30 |       15 |   nan |
+| 2018-03-01 |   2985 |        0 |         25 |   11 |        0 |  127 |    36 |       14 |   nan |
+| 2018-04-01 |   3188 |        0 |         30 |   12 |        0 |  127 |    40 |       13 |   nan |
+| 2018-05-01 |   2180 |        0 |         35 |    8 |        0 |   78 |    47 |       10 |   nan |
+| 2018-06-01 |   3285 |        0 |         35 |   12 |        0 |  116 |    44 |       10 |   nan |
+| 2018-07-01 |   5455 |        0 |         38 |   20 |        0 |  180 |    48 |       10 |   nan |
+| 2018-08-01 |   4100 |        0 |         38 |   15 |        0 |  132 |    48 |       10 |   nan |
+| 2018-09-01 |   4130 |        0 |         40 |   15 |        0 |  127 |    51 |       10 |   nan |
+| 2018-10-01 |   4430 |        0 |         40 |   15 |        0 |  138 |    53 |       15 |   nan |
 
 
-* Breakdown
-** Reps By muscle last month
+** Speed on the treadmill
 
-#+header: :var value="reps" period="month" 
+#+header: :var value="speed" period="day" months="all" muscle="all" exercise="Running (Treadmill)"
 #+begin_src python :session plots :results file :exports results
-graph.draw_pie_graph(trains, value, period, data_path)
+graph.draw_line_graph(trains, value, period, months, muscle, exercise, data_path)
 #+end_src
 
 #+RESULTS:
 [[file:/home/guancio/Sources/org-fit/data/13.png]]
 
+** Distance on the Rowing machine
 
-
-#+header: :var value="vol" period="week" 
-#+begin_src python :session plots :results value table :exports results
-graph.get_breakout(trains, value, period)
+#+header: :var value="distance" period="month" months="all" muscle="all" exercise="Rowing Machine"
+#+begin_src python :session plots :results file :exports results
+graph.draw_line_graph(trains, value, period, months, muscle, exercise, data_path)
 #+end_src
 
 #+RESULTS:
-| Abs       | 20% |
-| Back      | 18% |
-| Legs      | 27% |
-| Shoulders | 16% |
-| Triceps   | 19% |
+[[file:/home/guancio/Sources/org-fit/data/18.png]]
+
+
+#+header: :var period="week" months=6 muscle="all" exercise="Rowing Machine"
+#+begin_src python :session plots :results value :exports results
+graph.get_summary(trains, period, months, muscle, exercise)
+#+end_src
+
+#+RESULTS:
+|       date | volume | distance | max-weight | sets | duration | reps | epley | max-reps | speed |
+| 2018-05-14 |      0 |     2000 |        nan |    1 |      580 |    1 |   nan |        1 |    12 |
+| 2018-05-28 |      0 |     2000 |        nan |    1 |      580 |    1 |   nan |        1 |    12 |
+| 2018-06-11 |      0 |     2000 |        nan |    1 |      580 |    1 |   nan |        1 |    12 |
+| 2018-07-02 |      0 |     2500 |        nan |    2 |      725 |    2 |   nan |        1 |    12 |
+| 2018-07-16 |      0 |     2000 |        nan |    2 |      593 |    2 |   nan |        1 |    12 |
+| 2018-07-23 |      0 |     1000 |        nan |    1 |      300 |    1 |   nan |        1 |    12 |
+| 2018-07-30 |      0 |     2000 |        nan |    1 |      584 |    1 |   nan |        1 |    12 |
+| 2018-08-27 |      0 |     2000 |        nan |    1 |      590 |    1 |   nan |        1 |    12 |
+| 2018-09-03 |      0 |     2000 |        nan |    1 |      572 |    1 |   nan |        1 |    13 |
+| 2018-09-10 |      0 |     2000 |        nan |    1 |      571 |    1 |   nan |        1 |    13 |
+| 2018-09-17 |      0 |     2000 |        nan |    1 |      566 |    1 |   nan |        1 |    13 |
+| 2018-09-24 |      0 |     2000 |        nan |    1 |      559 |    1 |   nan |        1 |    13 |
+| 2018-10-01 |      0 |     1250 |        nan |    1 |      345 |    1 |   nan |        1 |    13 |
+| 2018-10-08 |      0 |     2000 |        nan |    1 |      562 |    1 |   nan |        1 |    13 |
+| 2018-10-22 |      0 |     4000 |        nan |    2 |     1119 |    2 |   nan |        1 |    13 |
 
 
 
-** Vol By muscle last week
+* Breakdown
+** Reps By muscle last month
 
-#+header: :var value="vol" period="week" 
+#+header: :var value="sets" period="all"
 #+begin_src python :session plots :results file :exports results
 graph.draw_pie_graph(trains, value, period, data_path)
 #+end_src
 
 #+RESULTS:
-[[file:/home/guancio/Sources/org-fit/data/16.png]]
+[[file:/home/guancio/Sources/org-fit/data/17.png]]
+
+
+#+header: :var value="vol" period="week"
+#+begin_src python :session plots :results value table :exports results
+graph.get_breakout(trains, period)
+#+end_src
+
+#+RESULTS:
+| muscle    | volume | distance | duration | reps | sets |
+| Abs       |    13% |       0% |       0% |  18% |  15% |
+| Back      |    19% |       0% |       0% |  15% |  15% |
+| Biceps    |     3% |       0% |       0% |   6% |   6% |
+| Cardio    |     0% |     100% |     100% |   0% |   4% |
+| Chest     |    15% |       0% |       0% |  13% |  12% |
+| Legs      |    27% |       0% |       0% |  25% |  27% |
+| Shoulders |    10% |       0% |       0% |  12% |  12% |
+| Triceps   |    13% |       0% |       0% |  10% |  10% |
+
+
+
+** Vol By muscle last week
+
+#+header: :var value="volume" period="week" 
+#+begin_src python :session plots :results file :exports results
+graph.draw_pie_graph(trains, value, period, data_path)
+#+end_src
+
+#+RESULTS:
+[[file:/home/guancio/Sources/org-fit/data/7.png]]
 
 
 

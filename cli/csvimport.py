@@ -1,4 +1,14 @@
+import pandas as pd
+import numpy as np
+import math
+from datetime import datetime
+import time
+import PyOrgMode
+import orgparser
+
 def import_csv(filein, fileout):
+    base = PyOrgMode.OrgDataStructure()
+    base.load_from_file(fileout)
     lines = open(filein).read()
     lines = lines.split("\n")[1:]
     lines = [l.split(",") for l in lines]
@@ -32,28 +42,36 @@ def import_csv(filein, fileout):
             activities.append(activity)
         grouped_entry.append(activities)
 
-    out = open(fileout, "w")
     for workout in grouped_entry:
-        out.write("""
-* Workout
-:PROPERTIES:
-:date: %s
-:END:
-""" % workout[0][0][0])
+        new_workout = PyOrgMode.OrgNode.Element()
+        new_workout.heading = "Workout"
+        new_workout.level = 1
+
+        workout_props = PyOrgMode.OrgDrawer.Element("PROPERTIES")
+        workout_props.append(PyOrgMode.OrgDrawer.Property("date", workout[0][0][0]))
+        new_workout.append_clean(workout_props)
+
         for activity in workout:
-            duration = "\n:duration: %s"%activity[0][7] if len(activity) == 1 and activity[0][7] != "" else ""
-            distance = "\n:distance: %s %s"%(activity[0][5], activity[0][6]) if len(activity) == 1 and activity[0][5] != "" else ""
-            out.write("""
-** %s
-:PROPERTIES:
-:muscle: %s %s %s
-:END:
-""" % (activity[0][1], activity[0][2], duration, distance))
+            new_activity = PyOrgMode.OrgNode.Element()
+            new_activity.heading = activity[0][1]
+            new_activity.level = 2
+            activity_props = PyOrgMode.OrgDrawer.Element("PROPERTIES")
+            activity_props.append(PyOrgMode.OrgDrawer.Property("muscle", activity[0][2]))
+            if len(activity) == 1 and activity[0][7] != "":
+                activity_props.append(PyOrgMode.OrgDrawer.Property("duration", activity[0][7]))
+            if len(activity) == 1 and activity[0][5] != "":
+                activity_props.append(PyOrgMode.OrgDrawer.Property(
+                    "distance",
+                    "%s %s"%(activity[0][5], activity[0][6])))
+            new_activity.append_clean(activity_props)
+            
             for rep in activity:
                 if (rep[3] == "") and (rep[4] == ""):
                     continue
                 if (float(rep[3]) > 0):
-                    out.write("- %s kgs x %s reps\n" % (rep[3], rep[4]))
+                    new_activity.append_clean("- %s kgs x %s reps\n" % (rep[3], rep[4]))
                 else:
-                    out.write("- %s reps\n" % (rep[4]))
-    out.close()
+                    new_activity.append_clean("- %s reps\n" % (rep[4]))
+            new_workout.append_clean(new_activity)
+        base.root.append_clean(new_workout)
+    base.save_to_file(fileout)

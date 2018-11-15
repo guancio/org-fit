@@ -7,24 +7,11 @@ import PyOrgMode
 import orgparser
 
 
-def get_property_drawer(element):
-    for e in element.content:
-        if not isinstance(e, PyOrgMode.OrgElement):
-            continue
-        if e.TYPE == "DRAWER_ELEMENT" or e.name == "PROPERTIES":
-            return e
-    return None
-
-def get_property(element, name):
-    p = [p for p in element.content if p.name == name]
-    if len(p) == 0:
-        return None
-    return p[0]
     
 
 def extend_epley(element):
-    properties = get_property_drawer(element)
-    epley_p = get_property(properties, "epley")
+    properties = orgparser.get_property_drawer(element)
+    epley_p = orgparser.get_property(properties, "epley")
     if epley_p is not None:
         return
     values = orgparser.parse_ex(element)
@@ -37,21 +24,21 @@ def extend_epley(element):
 
 
 def extend_speed(element):
-    properties = get_property_drawer(element)
-    distance = get_property(properties, "distance")
+    properties = orgparser.get_property_drawer(element)
+    distance = orgparser.get_property(properties, "distance")
     if distance is None:
         return
     distance = float(distance.value.split(" ")[0])
     if distance == 0:
         return
-    duration = get_property(properties, "duration")
+    duration = orgparser.get_property(properties, "duration")
     if duration is None:
         return
     duration = time.strptime(duration.value.strip(), "%H:%M:%S")
     duration = duration.tm_hour * 3600 + duration.tm_min * 60 + duration.tm_sec
-    if get_property(properties, "speed") is None:
+    if orgparser.get_property(properties, "speed") is None:
         properties.append(PyOrgMode.OrgDrawer.Property("speed", "%.2f km/h" % (distance * 3.6 / 1000)))
-    if get_property(properties, "pace") is None:
+    if orgparser.get_property(properties, "pace") is None:
         properties.append(PyOrgMode.OrgDrawer.Property("pace", "%d:%d m/km" %
                                                        ((duration/(distance / 1000)/60),
                                                         (duration/(distance / 1000) % 60)
