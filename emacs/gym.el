@@ -18,6 +18,7 @@ sys.path.append(fit_path)
 import orgparser
 import graph
 import csvimport
+import process_fit
 from cmd import Cmd
 trains = orgparser.parse_gym_file(org_file)
 " org-fit-cli-exec org-fit-data-file org-fit-export-path)

@@ -12,7 +12,7 @@ graph.draw_line_graph(trains, value, period, months, muscle, exercise, data_path
 #+end_src
 
 #+RESULTS:
-[[file:/home/guancio/Sources/org-fit/data/10.png]]
+[[file:/home/guancio/Sources/org-fit/data/3.png]]
 
 
 #+header: :var period="month" months="all" muscle="all" exercise="all"
